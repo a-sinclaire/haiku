@@ -1,3 +1,4 @@
+import json
 import logging
 import nltk
 from nltk.tokenize import word_tokenize
@@ -5,7 +6,6 @@ import re
 import string
 import itertools
 import syllables
-import syllable_count
 
 
 # logging.basicConfig(level=logging.INFO)
@@ -21,6 +21,8 @@ def tokenize(text):
 class HaikuDetector:
     def __init__(self):
         self.pronunciations = nltk.corpus.cmudict.dict()
+        with open('syllable_dictionary.json') as f:
+            self.syllable_dict = json.load(f)
 
     def print_info(self, poem):
         for line in poem:
@@ -28,8 +30,8 @@ class HaikuDetector:
         print()
 
     def guess_syllables(self, word):
-        if word in syllable_count.syllables:
-            return syllable_count.syllables[word]
+        if word in self.syllable_dict:
+            return self.syllable_dict[word]
         logging.warning(f'{word} not found in pronunciation dictionary')
         return syllables.estimate(word)
         # vowel_groups = re.findall(r'[a|e|i|o|u]+.[e]|[a|e|i|o|u]+|[y]$', word)
