@@ -1,14 +1,13 @@
 import json
 import logging
 import nltk
-from nltk.tokenize import word_tokenize
 import re
-import string
 import itertools
 import syllables
 
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
+logging.disable(level=logging.ERROR)
 
 
 def tokenize(text):
@@ -34,11 +33,6 @@ class HaikuDetector:
             return self.syllable_dict[word]
         logging.warning(f'{word} not found in pronunciation dictionary')
         return syllables.estimate(word)
-        # vowel_groups = re.findall(r'[a|e|i|o|u]+.[e]|[a|e|i|o|u]+|[y]$', word)
-        # syllable_guess = len(vowel_groups)
-        # if syllable_guess < 1:
-        #     return 1
-        # return syllable_guess
 
     def num_syllable(self, word):
         if word not in self.pronunciations:
@@ -54,10 +48,6 @@ class HaikuDetector:
                 if phoneme_is_vowel is not None:
                     current_syllable_count += 1
             syllables_in_pronunciations.append(current_syllable_count)
-        # lowest_syllable_count = min(syllables_in_pronunciations)
-        # if lowest_syllable_count == 0:
-        #     logging.warning(f'{word}: lowest syllable count 0')
-        #     return -1
         return sorted(list(set(syllables_in_pronunciations)))
 
     def num_syllables(self, line):
@@ -74,19 +64,19 @@ class HaikuDetector:
 
     def is_haiku(self, poem):
         if len(poem) != 3:
-            logging.error('Not 3 lines.')
-            self.print_info(poem)
+            # logging.error('Not 3 lines.')
+            # self.print_info(poem)
             return False
         if 5 not in [sum(x) for x in self.num_syllables(poem[0])]:
-            logging.error(f'First line has {[sum(x) for x in self.num_syllables(poem[0])]} syllables instead of 5')
+            # logging.error(f'First line has {[sum(x) for x in self.num_syllables(poem[0])]} syllables instead of 5')
             # self.print_info(poem)
             return False
         if 7 not in [sum(x) for x in self.num_syllables(poem[1])]:
-            logging.error(f'Second line has {[sum(x) for x in self.num_syllables(poem[1])]} syllables instead of 7')
+            # logging.error(f'Second line has {[sum(x) for x in self.num_syllables(poem[1])]} syllables instead of 7')
             # self.print_info(poem)
             return False
         if 5 not in [sum(x) for x in self.num_syllables(poem[2])]:
-            logging.error(f'Third line has {[sum(x) for x in self.num_syllables(poem[1])]} syllables instead of 5')
+            # logging.error(f'Third line has {[sum(x) for x in self.num_syllables(poem[1])]} syllables instead of 5')
             # self.print_info(poem)
             return False
         return True
