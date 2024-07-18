@@ -31,7 +31,7 @@ class HaikuDetector:
     def guess_syllables(self, word):
         if word in self.syllable_dict:
             return self.syllable_dict[word]
-        logging.warning(f'{word} not found in pronunciation dictionary')
+        print(f'{word} not found in pronunciation dictionary')
         return syllables.estimate(word)
 
     def num_syllable(self, word):
