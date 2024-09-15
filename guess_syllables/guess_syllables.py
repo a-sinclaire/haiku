@@ -114,7 +114,7 @@ def sammy_guess(word: str) -> int:
     return max((1, characters.count('V')))
 
 
-def guess_syllables(word):
+def num_syllables(word):
     global syllable_dict
 
     syllables = []
