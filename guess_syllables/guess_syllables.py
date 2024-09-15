@@ -1,5 +1,5 @@
-from collections.abc import Iterable
 from itertools import chain
+import json
 import re
 
 import nltk
@@ -9,6 +9,9 @@ try:
 except LookupError:
     nltk.download('cmudict')
     pronunciations = nltk.corpus.cmudict.dict()
+
+with open('syllable_dictionary.json') as f:
+    syllable_dict = json.load(f)
 
 def phone_syllables(word):
     global pronunciations
@@ -112,10 +115,27 @@ def sammy_guess(word: str) -> int:
 
 
 def guess_syllables(word):
+    global syllable_dict
+
+    syllables = []
+    found = False
+    # if word is in dictionary add that syllable count
+    if word in syllable_dict:
+        syllables.append(syllable_dict[word])
+        found = True
+
     try:
-        return phone_syllables(word)
+        # if the word is in the CMU guess other possible counts
+        # (accounts for variations in pronunciation)
+        syllables.extend(phone_syllables(word))
+        found = True
     except:
-        try:
-            return regex_syllables(word)
-        except:
-            return [1]
+        pass
+
+    # if it was in the dictionary we can exit now. no need to guess
+    if found:
+        return sorted(list(set(syllables)))
+
+    # if it wasn't in the dictionary or in the CMU dictionary we guess
+    syllables.append(sammy_guess(word))
+    return sorted(list(set(syllables)))
