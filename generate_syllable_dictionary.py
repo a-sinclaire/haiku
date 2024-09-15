@@ -316,5 +316,61 @@ syllables_dict['tumblr'] = 2
 syllables_dict['trashcan'] = 2
 syllables_dict['snapchat'] = 2
 
+# scraping some website for its (questionable) info:
+import requests
+
+from bs4 import BeautifulSoup
+from syllables import syllable
+
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36"
+LANGUAGE = "en-US,en;q=0.5"
+session = requests.Session()
+session.headers['User-Agent'] = USER_AGENT
+session.headers['Accept-Language'] = LANGUAGE
+session.headers['Content-Language'] = LANGUAGE
+
+# creating url and requests instance
+def scrape(url):
+    try:
+        html = session.get(url)
+    except requests.exceptions.ConnectionError:
+        raise Exception("Connection Error!")
+
+    # getting raw data
+    soup = BeautifulSoup(html.text, 'html.parser')
+
+    # print(soup.prettify())
+    page_strings = [x.string for x in soup.find_all('a')]
+    words = []
+    start = False
+    for string in page_strings:
+        if string == 'Z' and start is False:
+            start = True
+            continue
+        if start is False:
+            continue
+        if string is None:
+            break
+        if len(string.split()) == 1:
+            words.append(string)
+    # print(words[:10])
+    return words
+
+syllable_list = []
+for i in range(15):
+    syllable_list.append(scrape(f'https://syllablecounter.io/words/{i+1}-syllable-words'))
+
+
+d = [(k, i) for (i, k) in enumerate(syllable_list)]
+e = []
+for word_list, count in d:
+    for word in word_list:
+        e.append((word, count+1))
+
+mydict = dict(e)
+
+syllables_dict = {**syllables_dict, **mydict}
+
+# saving out to a file
 with open('syllable_dictionary.json', 'w') as f:
     json.dump(dict(sorted(syllables_dict.items())), f)
